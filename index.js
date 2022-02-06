@@ -13,9 +13,16 @@ function onConnection(socket){
 	socket.on("disconnect", (reason) => {
     	disconnect(reason, socket);
   	});
+	
+	socket.on('login-username', (data) => handleLogin(data.userName, socket));
 }
 
 function disconnect(reason, socket){
+	if(socket.user == null){
+		return;
+	}
+	
+	io.sockets.emit('user-disconnect', {user: socket.user.name, id: socket.user.id});
 	updateUserCount(socket, io.engine.clientsCount);
 }
 
@@ -23,7 +30,23 @@ function updateUserCount(socket, amount){
 	io.sockets.emit('user-count-change', amount);
 }
 
-io.on('connection', onConnection);
+function handleLogin(userName, socket){
+	socket.user = {name: userName, id: randomId()};
+	socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
+	console.log(io.sockets.sockets);
+	io.sockets.sockets.forEach(client => {
+		if(client.user != null && client.user.id != socket.user.id){
+			socket.emit('user-login', {user: client.user.name, id: client.user.id});
+		}
+	});
+}
 
+function randomId(){
+  return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+}
+
+io.on('connection', onConnection);
 
 http.listen(port, () => console.log('listening on port ' + port));

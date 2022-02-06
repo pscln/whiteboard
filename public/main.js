@@ -1,7 +1,5 @@
 'use strict';
 
-(function() {
-
   var socket = io();
   var canvas = document.getElementsByClassName('whiteboard')[0];
   var colors = document.getElementsByClassName('color');
@@ -11,6 +9,7 @@
     color: 'black'
   };
   var drawing = false;
+  var userName = "";
 
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
@@ -41,6 +40,33 @@
           }
         }, 250);
   });
+
+	
+	socket.on('user-login', function(data){
+		console.log(data.user);
+		console.log(userName);
+		if(data.user == userName){
+			return;
+		}
+		console.log('lmao');
+		$('#user-list').append('<li class="list-group-item" id="user-other-' + data.id + '">' + data.user + '</li>');
+	});
+
+	socket.on('user-disconnect', function(data){
+		$('#user-other-' + data.id).remove();
+	});
+
+	var userNameModal = new bootstrap.Modal(document.getElementById('username-modal'), {
+		backdrop: 'static', 
+		keyboard: false,
+        focus: true,
+    });
+	userNameModal.show();
+	
+	var userListModal = new bootstrap.Modal(document.getElementById('userlist-modal'), {
+		keyboard: true,
+        focus: true,
+    });
 
   window.addEventListener('resize', onResize, false);
   onResize();
@@ -123,5 +149,15 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
+  
+function userNameSubmit(){
+	var name = $('#username-input').val();
+	console.log(name);
+	userNameModal.hide();
+	userName = name;
+	socket.emit('login-username', {userName: name});
+}
 
-})();
+function toggleUserList(){
+	userListModal.toggle();
+}
