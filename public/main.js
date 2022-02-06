@@ -28,8 +28,18 @@
   }
 
   socket.on('drawing', onDrawingEvent);
+  var eventsQueued = 0;
   socket.on('user-count-change', function(data){
+      eventsQueued++;
       $('#user-count').text(data);
+      $('#user-count').addClass("wiggle");
+      setTimeout(
+        function() {
+          eventsQueued--;
+          if(eventsQueued == 0) {
+            $('#user-count').removeClass("wiggle");
+          }
+        }, 250);
   });
 
   window.addEventListener('resize', onResize, false);
