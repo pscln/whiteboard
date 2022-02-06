@@ -28,6 +28,9 @@
   }
 
   socket.on('drawing', onDrawingEvent);
+  socket.on('user-count-change', function(data){
+      $('#user-count').text(data);
+  });
 
   window.addEventListener('resize', onResize, false);
   onResize();
