@@ -35,6 +35,14 @@
   window.addEventListener('resize', onResize, false);
   onResize();
 
+  function fadeOut(){
+    context.fillStyle = "rgba(255, 255, 255, 0.05)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    setTimeout(fadeOut, 1000);
+  }
+
+  fadeOut();
+
 
   function drawLine(x0, y0, x1, y1, color, emit){
     context.beginPath();
