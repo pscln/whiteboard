@@ -31,14 +31,27 @@ function updateUserCount(socket, amount){
 }
 
 function handleLogin(userName, socket){
+	var confirm = true;
 	socket.user = {name: userName, id: randomId()};
 	socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
-	console.log(io.sockets.sockets);
+	
+	// check if name already exists
+	io.sockets.sockets.forEach(client => {
+		if(socket != client && client.user != null && userName == client.user.name){
+			socket.emit('user-login-exists', {});
+			confirm = false;
+		}
+	});
+	
 	io.sockets.sockets.forEach(client => {
 		if(client.user != null && client.user.id != socket.user.id){
 			socket.emit('user-login', {user: client.user.name, id: client.user.id});
 		}
 	});
+	
+	if(confirm){
+		socket.emit('user-login-confirm', {});
+	}
 }
 
 function randomId(){

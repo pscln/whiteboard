@@ -43,13 +43,18 @@
 
 	
 	socket.on('user-login', function(data){
-		console.log(data.user);
-		console.log(userName);
 		if(data.user == userName){
 			return;
 		}
-		console.log('lmao');
 		$('#user-list').append('<li class="list-group-item" id="user-other-' + data.id + '">' + data.user + '</li>');
+	});
+	
+	socket.on('user-login-exists', function(data){
+		$('#alert-user-alreadyexists').show();
+	});
+	
+	socket.on('user-login-confirm', function(data){
+		userNameModal.hide();
 	});
 
 	socket.on('user-disconnect', function(data){
@@ -61,6 +66,7 @@
 		keyboard: false,
         focus: true,
     });
+	$('#alert-user-alreadyexists').hide();
 	userNameModal.show();
 	
 	var userListModal = new bootstrap.Modal(document.getElementById('userlist-modal'), {
@@ -152,8 +158,6 @@
   
 function userNameSubmit(){
 	var name = $('#username-input').val();
-	console.log(name);
-	userNameModal.hide();
 	userName = name;
 	socket.emit('login-username', {userName: name});
 }
