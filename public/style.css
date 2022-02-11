@@ -28,13 +28,14 @@ html, body {
 }
 
 .colors {
+  padding: 0.2em 0.5em;
   position: fixed;
 }
 
 .color {
   display: inline-block;
-  height: 48px;
-  width: 48px;
+  height: 32px;
+  width: 32px;
 }
 
 .wiggle {

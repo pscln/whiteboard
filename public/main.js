@@ -48,13 +48,20 @@
 		}
 		$('#user-list').append('<li class="list-group-item" id="user-other-' + data.id + '">' + data.user + '</li>');
 	});
-	
+
 	socket.on('user-login-exists', function(data){
+    $('#alert-user-invalid').hide();
 		$('#alert-user-alreadyexists').show();
 	});
+
+  socket.on('user-login-invalid', function(data){
+    $('#alert-user-alreadyexists').hide();
+    $('#alert-user-invalid').show();
+  });
 	
 	socket.on('user-login-confirm', function(data){
 		userNameModal.hide();
+    $('#user-you').text(userName + ' (you)');
 	});
 
 	socket.on('user-disconnect', function(data){
@@ -67,6 +74,7 @@
         focus: true,
     });
 	$('#alert-user-alreadyexists').hide();
+  $('#alert-user-invalid').hide();
 	userNameModal.show();
 	
 	var userListModal = new bootstrap.Modal(document.getElementById('userlist-modal'), {

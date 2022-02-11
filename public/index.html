@@ -39,6 +39,9 @@
 						<h5 class="modal-title">Welcome!</h5>
 					</div>
 					<div class="modal-body">
+						<div id="alert-user-invalid" class="alert alert-danger" role="alert">
+							This username is invalid!
+						</div>
 						<div id="alert-user-alreadyexists" class="alert alert-danger" role="alert">
 							This username already exists!
 						</div>
@@ -55,14 +58,14 @@
 	
 	<div class="modal fade" id="userlist-modal" tabindex="-1">
 		<div class="modal-dialog">
-			<div class="modal-content">				
+			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title">User list</h5>
 				</div>
 				<div class="modal-body">
 					<p>Online users:</p>
 					<ul class="list-group" id="user-list">
-						<li class="list-group-item" id="user-you">You</li>
+						<li class="list-group-item list-group-item-info" id="user-you">You</li>
 					</ul>
 				</div>
 				<div class="modal-footer">

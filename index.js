@@ -6,9 +6,9 @@ const port = process.env.PORT || 8080;
 
 app.use(express.static(__dirname + '/public'));
 
-function onConnection(socket){
-	updateUserCount(socket, io.engine.clientsCount);
+clientCount = 0;
 
+function onConnection(socket){
 	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
 	socket.on("disconnect", (reason) => {
     	disconnect(reason, socket);
@@ -23,18 +23,24 @@ function disconnect(reason, socket){
 	}
 	
 	io.sockets.emit('user-disconnect', {user: socket.user.name, id: socket.user.id});
-	updateUserCount(socket, io.engine.clientsCount);
+	clientCount = Math.max(clientCount - 1, 0);
+	updateUserCount(socket, clientCount);
 }
 
-function updateUserCount(socket, amount){
-	io.sockets.emit('user-count-change', amount);
+function updateUserCount(socket){
+	io.sockets.emit('user-count-change', clientCount);
 }
 
 function handleLogin(userName, socket){
 	var confirm = true;
 	socket.user = {name: userName, id: randomId()};
-	socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
 	
+	// check if user name is empty string
+	if(userName == ""){
+		socket.emit('user-login-invalid', {});
+		confirm = false;
+	}
+
 	// check if name already exists
 	io.sockets.sockets.forEach(client => {
 		if(socket != client && client.user != null && userName == client.user.name){
@@ -50,6 +56,9 @@ function handleLogin(userName, socket){
 	});
 	
 	if(confirm){
+		clientCount ++;
+		updateUserCount(socket);
+		socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
 		socket.emit('user-login-confirm', {});
 	}
 }
