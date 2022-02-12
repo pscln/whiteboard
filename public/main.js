@@ -245,7 +245,6 @@ function logout(){
 
 function clearScreen(){
   if(!$("#button-clear").is(":disabled")){
-    console.log('lmao')
     socket.emit('clear-screen', {});
   }
 }
