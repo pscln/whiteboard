@@ -100,6 +100,15 @@ function handleDrawing(data){
     ctx.closePath();
 }
 
+function fadeOut(){
+    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.fillRect(0, 0, width, height);
+    setTimeout(fadeOut, 1000);
+}
+
+
 io.on('connection', onConnection);
 
 http.listen(port, () => console.log('listening on port ' + port));
+
+fadeOut();
