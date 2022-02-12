@@ -32,14 +32,7 @@ function onConnection(socket){
 	});
 
 	socket.on('clear-screen', (socket, data) => {
-		if(clearAllowed){
-			clearAllowed = false;
-			io.sockets.emit('clear-screen', {clear: true});
-			setTimeout(() => {
-				clearAllowed = true;
-				io.sockets.emit('clear-screen', {clear: false});
-			}, CLEAR_COOLDOWN)
-		}
+		clearScreen(false);
 	});
 
 	sendScreen(socket);
@@ -47,6 +40,10 @@ function onConnection(socket){
 }
 
 function disconnect(reason, socket){
+	if(io.engine.clientsCount == 0){
+		clearScreen(true);
+	}
+
 	if(socket.user == null){
 		return;
 	}
@@ -116,6 +113,22 @@ function fadeOut(){
     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
     ctx.fillRect(0, 0, width, height);
     setTimeout(fadeOut, 1000);
+}
+
+function clearScreen(force){
+	if(clearAllowed || force){
+		if(!force){
+			clearAllowed = false;
+			setTimeout(() => {
+				clearAllowed = true;
+				io.sockets.emit('clear-screen', {clear: false});
+			}, CLEAR_COOLDOWN)
+		}
+		
+		ctx.fillStyle = "rgba(255, 255, 255, 255)";
+    	ctx.fillRect(0, 0, width, height);
+		io.sockets.emit('clear-screen', {clear: true});
+	}
 }
 
 
