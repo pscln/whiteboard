@@ -1,5 +1,8 @@
 'use strict';
 
+  const WIDTH = 1280;
+  const HEIGHT = 720;
+
   var socket = io();
   var canvas = document.getElementsByClassName('whiteboard')[0];
   var colors = document.getElementsByClassName('color');
@@ -73,6 +76,20 @@
 	socket.on('user-disconnect', function(data){
 		$('#user-other-' + data.id).remove();
 	});
+
+  socket.on('resize', function(data){
+    var array = new Uint8ClampedArray(data.image);
+    var image = new ImageData(array, WIDTH, HEIGHT);
+
+    var scaleW = WIDTH / canvas.width;
+    var scaleH = HEIGHT / canvas.height;
+
+    var offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
+    var oCtx = offscreenCanvas.getContext('2d');
+    oCtx.putImageData(image, 0, 0);
+    oCtx.scale(scaleW, scaleH);
+    context.putImageData(oCtx.getImageData(0, 0, canvas.width, canvas.height), 0, 0);
+  });
 
 	var userNameModal = new bootstrap.Modal(document.getElementById('username-modal'), {
 		backdrop: 'static', 
@@ -175,6 +192,7 @@
   function onResize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    socket.emit('resize', {});
   }
   
 function userNameSubmit(){

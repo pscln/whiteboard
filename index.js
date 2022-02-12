@@ -6,14 +6,29 @@ const port = process.env.PORT || 8080;
 
 app.use(express.static(__dirname + '/public'));
 
+const { createCanvas, loadImage } = require('canvas')
+const canvas = createCanvas(1280, 720)
+const ctx = canvas.getContext('2d')
+
+const width = 1280;
+const height = 720;
+
 clientCount = 0;
 
 function onConnection(socket){
-	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
+	socket.on('drawing', (data) => {
+		handleDrawing(data);
+		socket.broadcast.emit('drawing', data);
+	});
+	
 	socket.on("disconnect", (reason) => {
     	disconnect(reason, socket);
   	});
-	
+
+	socket.on('resize', () => {
+		resize(socket);
+	});
+
 	socket.on('login-username', (data) => handleLogin(data.userName, socket));
 }
 
@@ -60,6 +75,7 @@ function handleLogin(userName, socket){
 		updateUserCount(socket);
 		socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
 		socket.emit('user-login-confirm', {});
+		resize(socket);
 	}
 }
 
@@ -67,6 +83,21 @@ function randomId(){
   return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
       .substring(1);
+}
+
+function resize(socket){
+	var data = ctx.getImageData(0, 0, width, height).data.buffer;
+	socket.emit('resize', {image: data});
+}
+
+function handleDrawing(data){
+	ctx.beginPath();
+    ctx.moveTo(data.x0 * width, data.y0 * height);
+    ctx.lineTo(data.x1 * width, data.y1 * height);
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.closePath();
 }
 
 io.on('connection', onConnection);
