@@ -79,17 +79,9 @@
 	});
 
   socket.on('screen', function(data){
-    var array = new Uint8ClampedArray(data.image);
-    var image = new ImageData(array, WIDTH, HEIGHT);
-
-    var scaleW = WIDTH / canvas.width;
-    var scaleH = HEIGHT / canvas.height;
-
-    var offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
-    var oCtx = offscreenCanvas.getContext('2d');
-    oCtx.putImageData(image, 0, 0);
-    oCtx.scale(scaleW, scaleH);
-    context.putImageData(oCtx.getImageData(0, 0, canvas.width, canvas.height), 0, 0);
+    var img = new Image();
+    img.onload = () => context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    img.src = data.image;
     loaded = true;
   });
 

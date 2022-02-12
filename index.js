@@ -86,8 +86,7 @@ function randomId(){
 }
 
 function sendScreen(socket){
-	var data = ctx.getImageData(0, 0, width, height).data.buffer;
-	socket.emit('screen', {image: data});
+	socket.emit('screen', {image: canvas.toDataURL()});
 }
 
 function handleDrawing(data){
