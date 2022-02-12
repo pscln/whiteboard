@@ -85,6 +85,16 @@
     loaded = true;
   });
 
+  socket.on('clear-screen', function(data){
+    if(data.clear){
+      context.fillStyle = "rgba(255, 255, 255, 255)";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      $("#button-clear").prop('disabled', true)
+    }else{
+      $("#button-clear").prop('disabled', false);
+    }
+  });
+
 	var userNameModal = new bootstrap.Modal(document.getElementById('username-modal'), {
 		backdrop: 'static', 
 		keyboard: false,
@@ -231,4 +241,11 @@ function getCookie(cname) {
 function logout(){
   setCookie('user-name', '', -1);
   location.reload();
+}
+
+function clearScreen(){
+  if(!$("#button-clear").is(":disabled")){
+    console.log('lmao')
+    socket.emit('clear-screen', {});
+  }
 }

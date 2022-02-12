@@ -10,10 +10,12 @@ const { createCanvas, loadImage } = require('canvas')
 const canvas = createCanvas(1280, 720)
 const ctx = canvas.getContext('2d')
 
+const CLEAR_COOLDOWN = 180000;
 const width = 1280;
 const height = 720;
 
 clientCount = 0;
+clearAllowed = true;
 
 function onConnection(socket){
 	socket.on('drawing', (data) => {
@@ -27,6 +29,17 @@ function onConnection(socket){
 
 	socket.on('screen', () => {
 		sendScreen(socket);
+	});
+
+	socket.on('clear-screen', (socket, data) => {
+		if(clearAllowed){
+			clearAllowed = false;
+			io.sockets.emit('clear-screen', {clear: true});
+			setTimeout(() => {
+				clearAllowed = true;
+				io.sockets.emit('clear-screen', {clear: false});
+			}, CLEAR_COOLDOWN)
+		}
 	});
 
 	sendScreen(socket);
