@@ -10,6 +10,7 @@
   };
   var drawing = false;
   var userName = "";
+  $('#button-logout').hide();
 
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
@@ -52,16 +53,21 @@
 	socket.on('user-login-exists', function(data){
     $('#alert-user-invalid').hide();
 		$('#alert-user-alreadyexists').show();
+    userNameModal.show();
 	});
 
   socket.on('user-login-invalid', function(data){
     $('#alert-user-alreadyexists').hide();
     $('#alert-user-invalid').show();
+    userNameModal.show();
   });
 	
 	socket.on('user-login-confirm', function(data){
 		userNameModal.hide();
     $('#user-you').text(userName + ' (you)');
+    $('#button-logout').text('Change name');
+    $('#button-logout').show();
+    setCookie('user-name', userName, 30);
 	});
 
 	socket.on('user-disconnect', function(data){
@@ -75,7 +81,14 @@
     });
 	$('#alert-user-alreadyexists').hide();
   $('#alert-user-invalid').hide();
-	userNameModal.show();
+	
+  var oldUser = getCookie('user-name');
+
+  if(oldUser == null){
+    userNameModal.show();
+  }else{
+    transmitUserName(oldUser);
+  }
 	
 	var userListModal = new bootstrap.Modal(document.getElementById('userlist-modal'), {
 		keyboard: true,
@@ -166,10 +179,42 @@
   
 function userNameSubmit(){
 	var name = $('#username-input').val();
-	userName = name;
-	socket.emit('login-username', {userName: name});
+	transmitUserName(name);
+}
+
+function transmitUserName(name){
+  userName = name;
+  socket.emit('login-username', {userName: name});
 }
 
 function toggleUserList(){
 	userListModal.toggle();
+}
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return null;
+}
+
+function logout(){
+  setCookie('user-name', '', -1);
+  location.reload();
 }
