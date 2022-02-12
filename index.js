@@ -25,10 +25,11 @@ function onConnection(socket){
     	disconnect(reason, socket);
   	});
 
-	socket.on('resize', () => {
-		resize(socket);
+	socket.on('screen', () => {
+		sendScreen(socket);
 	});
 
+	sendScreen(socket);
 	socket.on('login-username', (data) => handleLogin(data.userName, socket));
 }
 
@@ -75,7 +76,6 @@ function handleLogin(userName, socket){
 		updateUserCount(socket);
 		socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
 		socket.emit('user-login-confirm', {});
-		resize(socket);
 	}
 }
 
@@ -85,9 +85,9 @@ function randomId(){
       .substring(1);
 }
 
-function resize(socket){
+function sendScreen(socket){
 	var data = ctx.getImageData(0, 0, width, height).data.buffer;
-	socket.emit('resize', {image: data});
+	socket.emit('screen', {image: data});
 }
 
 function handleDrawing(data){

@@ -3,6 +3,7 @@
   const WIDTH = 1280;
   const HEIGHT = 720;
 
+  var loaded = false;
   var socket = io();
   var canvas = document.getElementsByClassName('whiteboard')[0];
   var colors = document.getElementsByClassName('color');
@@ -77,7 +78,7 @@
 		$('#user-other-' + data.id).remove();
 	});
 
-  socket.on('resize', function(data){
+  socket.on('screen', function(data){
     var array = new Uint8ClampedArray(data.image);
     var image = new ImageData(array, WIDTH, HEIGHT);
 
@@ -89,6 +90,7 @@
     oCtx.putImageData(image, 0, 0);
     oCtx.scale(scaleW, scaleH);
     context.putImageData(oCtx.getImageData(0, 0, canvas.width, canvas.height), 0, 0);
+    loaded = true;
   });
 
 	var userNameModal = new bootstrap.Modal(document.getElementById('username-modal'), {
@@ -125,6 +127,8 @@
 
 
   function drawLine(x0, y0, x1, y1, color, emit){
+    if(!loaded){ return; }
+
     context.beginPath();
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
