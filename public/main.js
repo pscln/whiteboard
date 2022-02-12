@@ -71,6 +71,7 @@
     $('#user-you').text(userName + ' (you)');
     $('#button-logout').text('Change name');
     $('#button-logout').show();
+    $("#button-clear").prop('disabled', !data.clearButtonAllowed);
     setCookie('user-name', userName, 30);
 	});
 
@@ -198,7 +199,7 @@
   function onResize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    socket.emit('resize', {});
+    socket.emit('screen', {});
   }
   
 function userNameSubmit(){

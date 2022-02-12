@@ -88,7 +88,7 @@ function handleLogin(userName, socket){
 		clientCount ++;
 		updateUserCount(socket);
 		socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
-		socket.emit('user-login-confirm', {});
+		socket.emit('user-login-confirm', {clearButtonAllowed: clearAllowed});
 	}
 }
 
