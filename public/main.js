@@ -8,6 +8,7 @@
   var canvas = document.getElementsByClassName('whiteboard')[0];
   var colors = document.getElementsByClassName('color');
   var context = canvas.getContext('2d');
+  var clearCountdown = 0;
 
   var current = {
     color: 'black'
@@ -90,11 +91,34 @@
     if(data.clear){
       context.fillStyle = "rgba(255, 255, 255, 255)";
       context.fillRect(0, 0, canvas.width, canvas.height);
-      $("#button-clear").prop('disabled', true)
+      
+      if(!data.force){
+        $("#button-clear").prop('disabled', true)
+      }
     }else{
       $("#button-clear").prop('disabled', false);
+      $('#button-clear-countdown').text('');
     }
   });
+
+  socket.on('clear-screen-countdown', function(data){
+    if(data.duration >= 1000){
+      clearCountdown = data.duration;
+      setTimeout(updateClearCount, 1000);
+    }else{
+      $('#button-clear-countdown').text('');
+    }
+  });
+
+  function updateClearCount(){
+    clearCountdown -= 1000;
+    if(clearCountdown >= 0){
+      $('#button-clear-countdown').text(' (' + (clearCountdown / 1000) + ')');
+      setTimeout(updateClearCount, 1000);
+    }else{
+      $('#button-clear-countdown').text('');
+    }
+  }
 
 	var userNameModal = new bootstrap.Modal(document.getElementById('username-modal'), {
 		backdrop: 'static', 

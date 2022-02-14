@@ -16,6 +16,7 @@ const height = 720;
 
 clientCount = 0;
 clearAllowed = true;
+lastClear = 0;
 
 function onConnection(socket){
 	socket.on('drawing', (data) => {
@@ -86,6 +87,7 @@ function handleLogin(userName, socket){
 		updateUserCount(socket);
 		socket.broadcast.emit('user-login', {user: userName, id: socket.user.id});
 		socket.emit('user-login-confirm', {clearButtonAllowed: clearAllowed});
+		socket.emit('clear-screen-countdown', {duration: Math.min(CLEAR_COOLDOWN - (Date.now() - lastClear), 0)})
 	}
 }
 
@@ -121,16 +123,17 @@ function clearScreen(force){
 			clearAllowed = false;
 			setTimeout(() => {
 				clearAllowed = true;
-				io.sockets.emit('clear-screen', {clear: false});
+				io.sockets.emit('clear-screen', {clear: false, force: false});
 			}, CLEAR_COOLDOWN)
+			io.sockets.emit('clear-screen-countdown', {duration: CLEAR_COOLDOWN});
+			lastClear = Date.now();
 		}
-		
+
 		ctx.fillStyle = "rgba(255, 255, 255, 255)";
     	ctx.fillRect(0, 0, width, height);
-		io.sockets.emit('clear-screen', {clear: true});
+		io.sockets.emit('clear-screen', {clear: true, force: force});
 	}
 }
-
 
 io.on('connection', onConnection);
 
