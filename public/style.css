@@ -27,6 +27,10 @@ html, body {
   top: 0;
 }
 
+.clr-field{
+  display: block !important;
+}
+
 .colors {
   padding: 0.2em 0.5em;
   position: fixed;

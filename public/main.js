@@ -17,6 +17,10 @@
   var userName = "";
   $('#button-logout').hide();
 
+  if(getCookie('color-picker-value') != null){
+    $('#color-picker').val(getCookie('color-picker-value'));
+  }
+
   canvas.addEventListener('mousedown', onMouseDown, false);
   canvas.addEventListener('mouseup', onMouseUp, false);
   canvas.addEventListener('mouseout', onMouseUp, false);
@@ -198,6 +202,11 @@
 
   function onColorUpdate(e){
     current.color = e.target.className.split(' ')[1];
+  }
+
+  function onColorPickerUpdate(e){
+    current.color = $('#color-picker').val();
+    setCookie('color-picker-value', current.color, 30);
   }
 
   // limit the number of events per second
