@@ -145,7 +145,7 @@
   onResize();
 
   function fadeOut(){
-    context.fillStyle = "rgba(255, 255, 255, 0.05)";
+    context.fillStyle = "rgba(255, 255, 255, 0.003125)";
     context.fillRect(0, 0, canvas.width, canvas.height);
     setTimeout(fadeOut, 1000);
   }

@@ -112,7 +112,7 @@ function handleDrawing(data){
 }
 
 function fadeOut(){
-    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.003125)";
     ctx.fillRect(0, 0, width, height);
     setTimeout(fadeOut, 1000);
 }
